@@ -73,7 +73,6 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
           </Button>
         </Box>
       </Box>
-
       {!isLoading && (
         <BookModal
           modalVisible={modalVisible}
