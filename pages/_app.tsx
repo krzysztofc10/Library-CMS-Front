@@ -57,9 +57,7 @@ function MyApp({ Component, pageProps }) {
   const theme = React.useMemo(
     () =>
       createTheme({
-        palette: {
-          mode
-        }
+        palette: { mode }
       }),
     [mode]
   );

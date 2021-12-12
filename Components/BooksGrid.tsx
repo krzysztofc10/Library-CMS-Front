@@ -7,6 +7,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { BookModal } from './BookModal';
+import { getBookInfo } from '../API/getBook';
 
 export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors } }: any) => {
   const newPhoto = String(id).length === 1 ? `0${id}` : String(id);
@@ -17,9 +18,8 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ADRESS}/books/${id}`);
-      const json = await res.json();
-      setBook(json.book);
+      const data = await getBookInfo(id);
+      setBook(data);
       setIsLoading(false);
     };
     fetchData();
