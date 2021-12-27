@@ -1,7 +1,3 @@
 import axios from 'axios';
 
-export const getBookInfo = (id) =>
-  axios
-    .get(`${process.env.NEXT_PUBLIC_API_ADRESS}/books/${id}`)
-    .then((response) => response.data.book)
-    .catch((error) => error);
+export const getBookInfo = (id) => axios.get(`${process.env.NEXT_PUBLIC_API_ADRESS}/books/${id}`);

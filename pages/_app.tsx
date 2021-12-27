@@ -38,8 +38,11 @@ function MyApp({ Component, pageProps }) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
     if (localStorage.getItem('mode') === null) {
+      localStorage.setItem('token', '');
       localStorage.setItem('mode', 'light');
     } else {
+      localStorage.setItem('token', '');
+
       setMode(localStorage.getItem('mode'));
     }
   }, []);
