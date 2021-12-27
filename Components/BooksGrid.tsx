@@ -6,28 +6,21 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { BookModal } from './BookModal';
-import { getBookInfo } from '../API/getBook';
+import { BookPreviewModal } from './BookPreview';
 
 export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors } }: any) => {
   const newPhoto = String(id).length === 1 ? `0${id}` : String(id);
   const [modalVisible, setModalVisible] = useState(false);
-  const [book, setBook] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isBorrow, setIsBorrow] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      const data = await getBookInfo(id);
-      setBook(data);
-      setIsLoading(false);
-    };
-    fetchData();
-  }, [setBook]);
-
-  function setVisibility() {
-    setModalVisible(false);
-  }
+  const setVisibility = () => {
+    setIsBorrow(false);
+    setModalVisible(!modalVisible);
+  };
+  const setBorrowVisibility = () => {
+    setIsBorrow(!isBorrow);
+    setModalVisible(!modalVisible);
+  };
 
   return (
     <Card sx={{ display: 'flex', boxShadow: 10 }}>
@@ -60,26 +53,44 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
           </Typography>
         </CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', pb: 1 }}>
-          <Button variant="contained" size="small" style={{ marginRight: 3, marginLeft: 5 }}>
+          <Button
+            variant="contained"
+            size="small"
+            style={{ marginRight: 3, marginLeft: 5 }}
+            onClick={() => setBorrowVisibility()}
+          >
             Wypożycz
           </Button>
           <Button
             variant="contained"
             size="small"
             color="secondary"
-            onClick={() => setModalVisible(true)}
+            onClick={() => setVisibility()}
           >
             Podgląd
           </Button>
         </Box>
       </Box>
-      {!isLoading && (
-        <BookModal
+      {modalVisible && (
+        <BookPreviewModal
+          id={id}
           modalVisible={modalVisible}
           setModalVisible={() => setVisibility()}
-          data={book}
+          isBorrow={isBorrow}
         />
       )}
     </Card>
   );
+};
+
+BookGrids.defaultProps = {
+  data: {
+    authors: [{ id: '', firstName: '', lastName: '' }],
+    id: 0,
+    pages: 0,
+    isbn: '',
+    type: '',
+    title: '',
+    issueDate: ''
+  }
 };

@@ -16,7 +16,7 @@ export default function Home() {
     const fetchData = async () => {
       setIsLoading(true);
       const data = await getBooks();
-      setBooks(data);
+      setBooks(data.data.books);
       setIsLoading(false);
     };
     fetchData();
