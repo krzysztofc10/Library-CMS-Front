@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types  */
 /* eslint-disable react/jsx-props-no-spreading  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   AppBar,
@@ -22,6 +22,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import bookImg from '../Images/bookblue-open.svg';
 import { colorHash } from './Helpers/colorName';
 import { BookGrids } from './BooksGrid';
+import { LoginAndRegister } from '../Components/LoginAndRegister';
 import '../styles/globals.css';
 import '../styles/Home.css';
 
@@ -29,23 +30,31 @@ function MyApp({ Component, pageProps }) {
   const user = 'Krzysztof M';
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [mode, setMode] = React.useState('light');
+  const [mode, setMode] = useState('light');
+  const [token, setToken] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side');
     if (jssStyles) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
     if (localStorage.getItem('mode') === null) {
-      localStorage.setItem('token', '');
       localStorage.setItem('mode', 'light');
     } else {
-      localStorage.setItem('token', '');
-
       setMode(localStorage.getItem('mode'));
     }
-  }, []);
+
+    if (localStorage.getItem('token').length > 0) {
+      setToken(localStorage.getItem('token'));
+    } else {
+      setToken('');
+    }
+  }, [setToken]);
+
+  const loginToApp = (tokenVal) => {
+    setToken(tokenVal);
+  };
 
   const toggleColorMode = () => {
     if (mode === 'light') {
@@ -126,11 +135,12 @@ function MyApp({ Component, pageProps }) {
                   display: { xs: 'block', md: 'none' }
                 }}
               >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
-                  </MenuItem>
-                ))}
+                {token.length > 0 &&
+                  pages.map((page) => (
+                    <MenuItem key={page} onClick={handleCloseNavMenu}>
+                      <Typography textAlign="center">{page}</Typography>
+                    </MenuItem>
+                  ))}
               </Menu>
             </Box>
             <Typography
@@ -142,23 +152,26 @@ function MyApp({ Component, pageProps }) {
               <Image src={bookImg} alt="book" width="60px" height="60px" />
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  {page}
-                </Button>
-              ))}
+              {token.length > 0 &&
+                pages.map((page) => (
+                  <Button
+                    key={page}
+                    onClick={handleCloseNavMenu}
+                    sx={{ my: 2, color: 'white', display: 'block' }}
+                  >
+                    {page}
+                  </Button>
+                ))}
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Otwórz ustawienia">
                 <>
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar sx={{ bgcolor: colorHash(user) }}>{user.match(/\b(\w)/g)}</Avatar>
-                  </IconButton>
+                  {token.length > 0 && (
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <Avatar sx={{ bgcolor: colorHash(user) }}>{user.match(/\b(\w)/g)}</Avatar>
+                    </IconButton>
+                  )}
                   <IconButton onClick={toggleColorMode}>
                     <ContrastIcon sx={{ fontSize: 45 }} />
                   </IconButton>
@@ -190,7 +203,11 @@ function MyApp({ Component, pageProps }) {
           </Toolbar>
         </Container>
       </AppBar>
-      <Component {...pageProps} />
+      {token.length > 0 ? (
+        <Component {...pageProps} />
+      ) : (
+        <LoginAndRegister loginFunc={(val) => loginToApp(val)} />
+      )}
     </ThemeProvider>
   );
 }

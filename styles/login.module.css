@@ -1,0 +1,81 @@
+.login {
+  display: grid;
+  grid-template-rows: 0.2fr;
+  grid-template-columns: 0.2fr 0.2fr;
+  justify-content: center;
+  align-content: center;
+  grid-template-areas:
+    'a a'
+    'd d'
+    'e e'
+    'b c';
+}
+
+.register {
+  display: grid;
+  grid-template-rows: 0.2fr;
+  grid-template-columns: 0.2fr 0.2fr;
+  justify-content: center;
+  align-content: center;
+  grid-template-areas:
+    'a a'
+    'd d'
+    'e e'
+    'f f'
+    'g g'
+    'b c';
+}
+
+.loginHeader {
+  grid-area: a;
+}
+
+.registerHeader {
+  grid-area: a;
+}
+
+.loginTextField1 {
+  grid-area: d;
+}
+
+.loginTextField2 {
+  grid-area: e;
+}
+
+.loginButton1 {
+  width: 100px;
+  grid-area: b;
+}
+
+.loginButton2 {
+  width: 100px;
+  grid-area: c;
+  justify-self: flex-end;
+}
+
+.registerButton1 {
+  width: 100px;
+  grid-area: b;
+}
+
+.registerButton2 {
+  width: 100px;
+  grid-area: c;
+  justify-self: flex-end;
+}
+
+.registerTextField1 {
+  grid-area: d;
+}
+
+.registerTextField2 {
+  grid-area: e;
+}
+
+.registerTextField3 {
+  grid-area: f;
+}
+
+.registerTextField4 {
+  grid-area: g;
+}
