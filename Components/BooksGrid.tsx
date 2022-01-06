@@ -3,13 +3,17 @@ import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Rating from '@mui/material/Rating';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import styles from '../styles/bookGrid.module.css';
 import { BookPreviewModal } from './BookPreview';
+import { postStars } from '../API/postStars.tsx';
 
 export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors } }: any) => {
   const newPhoto = String(id).length === 1 ? `0${id}` : String(id);
+  const [stars, setStars] = React.useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [isBorrow, setIsBorrow] = useState(false);
 
@@ -17,13 +21,28 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
     setIsBorrow(false);
     setModalVisible(!modalVisible);
   };
+
   const setBorrowVisibility = () => {
     setIsBorrow(!isBorrow);
     setModalVisible(!modalVisible);
   };
 
+  const setBooksRatings = async (val) => {
+    const token = localStorage.getItem('token');
+    setStars(val);
+    await postStars(id, val.toString(), token);
+  };
+
   return (
-    <Card sx={{ display: 'flex', boxShadow: 10 }}>
+    <Card sx={{ display: 'flex', boxShadow: 10, position: 'relative' }}>
+      <Rating
+        name="simple-controlled"
+        className={styles.books}
+        value={stars}
+        onChange={(event, newValue) => {
+          setBooksRatings(newValue);
+        }}
+      />
       <CardMedia
         component="img"
         sx={{ width: 150 }}
@@ -71,14 +90,12 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
           </Button>
         </Box>
       </Box>
-      {modalVisible && (
-        <BookPreviewModal
-          id={id}
-          modalVisible={modalVisible}
-          setModalVisible={() => setVisibility()}
-          isBorrow={isBorrow}
-        />
-      )}
+      <BookPreviewModal
+        id={id}
+        modalVisible={modalVisible}
+        setModalVisible={() => setVisibility()}
+        isBorrow={isBorrow}
+      />
     </Card>
   );
 };

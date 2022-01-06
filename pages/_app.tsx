@@ -45,7 +45,7 @@ function MyApp({ Component, pageProps }) {
       setMode(localStorage.getItem('mode'));
     }
 
-    if (localStorage.getItem('token').length > 0) {
+    if (localStorage.getItem('token') !== null && localStorage.getItem('token').length > 0) {
       setToken(localStorage.getItem('token'));
     } else {
       setToken('');
