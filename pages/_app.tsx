@@ -10,24 +10,26 @@ import {
   Menu,
   Container,
   Avatar,
-  Button,
   Tooltip,
   MenuItem,
   IconButton
 } from '@mui/material';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import ContrastIcon from '@mui/icons-material/Contrast';
 import MenuIcon from '@mui/icons-material/Menu';
 import CssBaseline from '@mui/material/CssBaseline';
+import jwtDecode from 'jwt-decode';
 import bookImg from '../Images/bookblue-open.svg';
 import { colorHash } from './Helpers/colorName';
-import { BookGrids } from './BooksGrid';
 import { LoginAndRegister } from '../Components/LoginAndRegister';
 import '../styles/globals.css';
 import '../styles/Home.css';
 
 function MyApp({ Component, pageProps }) {
-  const user = 'Krzysztof M';
+  let user = 'Anon';
+  const router = useRouter();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [mode, setMode] = useState('light');
@@ -49,6 +51,11 @@ function MyApp({ Component, pageProps }) {
       setToken(localStorage.getItem('token'));
     } else {
       setToken('');
+    }
+    if (localStorage.getItem('token') !== null && localStorage.getItem('token').length > 0) {
+      user = jwtDecode(localStorage.getItem('token')).username;
+      if (localStorage.getItem('userId') === null)
+        localStorage.setItem('userId', jwtDecode(localStorage.getItem('token')).sub);
     }
   }, [setToken]);
 
@@ -73,8 +80,6 @@ function MyApp({ Component, pageProps }) {
       }),
     [mode]
   );
-  const pages = ['Wypożycz książkę', 'Zwróć książkę', 'Pokaż wypożyczone książki'];
-  const settings = ['Ustawienia', 'Wyloguj'];
 
   const handleOpenNavMenu = (event: any) => {
     setAnchorElNav(event.currentTarget);
@@ -89,6 +94,11 @@ function MyApp({ Component, pageProps }) {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const Logout = () => {
+    localStorage.setItem('token', '');
+    router.reload();
   };
 
   return (
@@ -117,31 +127,38 @@ function MyApp({ Component, pageProps }) {
               >
                 <MenuIcon />
               </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left'
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left'
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: 'block', md: 'none' }
-                }}
-              >
-                {token.length > 0 &&
-                  pages.map((page) => (
-                    <MenuItem key={page} onClick={handleCloseNavMenu}>
-                      <Typography textAlign="center">{page}</Typography>
+              {token.length > 0 && (
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorElNav}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left'
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left'
+                  }}
+                  open={Boolean(anchorElNav)}
+                  onClose={handleCloseNavMenu}
+                  sx={{
+                    display: { xs: 'block', md: 'none' }
+                  }}
+                >
+                  <Link href="/">
+                    <MenuItem key="1">Wypożycz książkę</MenuItem>
+                  </Link>
+                  <MenuItem key="2">
+                    <Typography textAlign="center">Zwróć książkę</Typography>
+                  </MenuItem>
+                  <Link href="/borrowedBooks">
+                    <MenuItem key="3">
+                      <Typography textAlign="center">Pokaż wypożyczone książki</Typography>
                     </MenuItem>
-                  ))}
-              </Menu>
+                  </Link>
+                </Menu>
+              )}
             </Box>
             <Typography
               variant="h6"
@@ -152,16 +169,17 @@ function MyApp({ Component, pageProps }) {
               <Image src={bookImg} alt="book" width="60px" height="60px" />
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {token.length > 0 &&
-                pages.map((page) => (
-                  <Button
-                    key={page}
-                    onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: 'white', display: 'block' }}
-                  >
-                    {page}
-                  </Button>
-                ))}
+              <Link href="/">
+                <MenuItem key="1">Wypożycz książkę</MenuItem>
+              </Link>
+              <MenuItem key="2">
+                <Typography textAlign="center">Zwróć książkę</Typography>
+              </MenuItem>
+              <Link href="/borrowedBooks">
+                <MenuItem key="3">
+                  <Typography textAlign="center">Pokaż wypożyczone książki</Typography>
+                </MenuItem>
+              </Link>
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>
@@ -193,11 +211,14 @@ function MyApp({ Component, pageProps }) {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
+                <MenuItem key="Ustawienia" onClick={handleCloseNavMenu}>
+                  <Typography textAlign="center">Ustawienia</Typography>
+                </MenuItem>
+                <MenuItem key="Wyloguj" onClick={handleCloseNavMenu}>
+                  <Typography textAlign="center" onClick={() => Logout()}>
+                    Wyloguj
+                  </Typography>
+                </MenuItem>
               </Menu>
             </Box>
           </Toolbar>
