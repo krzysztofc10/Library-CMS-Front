@@ -56,8 +56,10 @@ export const BookPreviewModal = ({ modalVisible, setModalVisible, id, isBorrow }
         setIsLoadingCopies(false);
       }
     };
-    fetchData();
-  }, [setBook]);
+    if (modalVisible) {
+      fetchData();
+    }
+  }, [setBook, modalVisible]);
 
   const rowClicked = async (rowVal) => {
     if (rowId.indexOf(rowVal.row.id) === -1) {
