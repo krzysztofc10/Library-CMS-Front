@@ -71,7 +71,8 @@ export const BookPreviewModal = ({ modalVisible, setModalVisible, id, isBorrow }
 
   const borrowBook = async () => {
     const token = localStorage.getItem('token');
-    const post = await postBookBorrowCopies(id, rowId[0], token);
+    const userId = localStorage.getItem('userId');
+    const post = await postBookBorrowCopies(id, rowId[0], token, userId);
     if (post.statusText === 'Created') {
       setAlertContent('Wypożyczono książkę');
     } else {

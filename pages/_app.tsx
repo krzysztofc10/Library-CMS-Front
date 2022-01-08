@@ -149,11 +149,8 @@ function MyApp({ Component, pageProps }) {
                   <Link href="/">
                     <MenuItem key="1">Wypożycz książkę</MenuItem>
                   </Link>
-                  <MenuItem key="2">
-                    <Typography textAlign="center">Zwróć książkę</Typography>
-                  </MenuItem>
                   <Link href="/borrowedBooks">
-                    <MenuItem key="3">
+                    <MenuItem key="2">
                       <Typography textAlign="center">Pokaż wypożyczone książki</Typography>
                     </MenuItem>
                   </Link>
@@ -172,11 +169,8 @@ function MyApp({ Component, pageProps }) {
               <Link href="/">
                 <MenuItem key="1">Wypożycz książkę</MenuItem>
               </Link>
-              <MenuItem key="2">
-                <Typography textAlign="center">Zwróć książkę</Typography>
-              </MenuItem>
               <Link href="/borrowedBooks">
-                <MenuItem key="3">
+                <MenuItem key="2">
                   <Typography textAlign="center">Pokaż wypożyczone książki</Typography>
                 </MenuItem>
               </Link>
