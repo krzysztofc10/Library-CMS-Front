@@ -1,48 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import Link from 'next/link';
 // import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Rating from '@mui/material/Rating';
 import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import styles from '../styles/bookGrid.module.css';
-import { BookPreviewModal } from './BookPreview';
-import { postStars } from '../API/postStars.tsx';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors } }: any) => {
   const newPhoto = String(id).length === 1 ? `0${id}` : String(id);
-  const [stars, setStars] = React.useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isBorrow, setIsBorrow] = useState(false);
-
-  const setVisibility = () => {
-    setIsBorrow(false);
-    setModalVisible(!modalVisible);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
-
-  const setBorrowVisibility = () => {
-    setIsBorrow(!isBorrow);
-    setModalVisible(!modalVisible);
-  };
-
-  const setBooksRatings = async (val) => {
-    const token = localStorage.getItem('token');
-    setStars(val);
-    await postStars(id, val.toString(), token);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
     <Card sx={{ display: 'flex', boxShadow: 10, position: 'relative' }}>
-      <Rating
-        name="simple-controlled"
-        className={styles.books}
-        value={stars}
-        onChange={(event, newValue) => {
-          setBooksRatings(newValue);
-        }}
-      />
       <CardMedia
         component="img"
         sx={{ width: 150 }}
@@ -51,6 +32,54 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
       />
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <CardContent sx={{ flex: '1 0 auto' }}>
+          <div style={{ float: 'right' }}>
+            <IconButton
+              aria-label="more"
+              id="long-button"
+              aria-controls={open ? 'long-menu' : undefined}
+              aria-expanded={open ? 'true' : undefined}
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="long-menu"
+              MenuListProps={{
+                'aria-labelledby': 'long-button'
+              }}
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              PaperProps={{
+                style: {
+                  maxHeight: 48 * 4.5,
+                  width: '20ch'
+                }
+              }}
+            >
+              <Link
+                href={{
+                  pathname: '/book/view/[id]',
+                  query: { id }
+                }}
+              >
+                <MenuItem key="1" onClick={handleClose}>
+                  Podgląd
+                </MenuItem>
+              </Link>
+              <Link
+                href={{
+                  pathname: '/book/borrow/[id]',
+                  query: { id }
+                }}
+              >
+                <MenuItem key="2" onClick={handleClose}>
+                  Wypożycz
+                </MenuItem>
+              </Link>
+            </Menu>
+          </div>
           <Typography component="div" variant="h5">
             {title}
           </Typography>
@@ -71,31 +100,7 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
             L.Stron: {pages}
           </Typography>
         </CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', pb: 1 }}>
-          <Button
-            variant="contained"
-            size="small"
-            style={{ marginRight: 3, marginLeft: 5 }}
-            onClick={() => setBorrowVisibility()}
-          >
-            Wypożycz
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="secondary"
-            onClick={() => setVisibility()}
-          >
-            Podgląd
-          </Button>
-        </Box>
       </Box>
-      <BookPreviewModal
-        id={id}
-        modalVisible={modalVisible}
-        setModalVisible={() => setVisibility()}
-        isBorrow={isBorrow}
-      />
     </Card>
   );
 };
