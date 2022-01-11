@@ -5,6 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { BookGrids } from '../Components/BooksGrid';
 import { CreateBookModal } from '../Components/CreateBook';
 import { getBooks } from '../API/getBooks';
+import { MultiSearch } from '../Components/MultiSearch.tsx';
 import styles from '../styles/index.module.css';
 
 export default function Home() {
@@ -14,9 +15,6 @@ export default function Home() {
   const [books, setBooks] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const setInputValue = (event: any) => {
-    setSearchInput(event.target.value);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,21 +58,18 @@ export default function Home() {
       <Paper
         component="form"
         sx={{
-          p: '2px 4px',
           display: 'flex',
-          alignItems: 'center',
-          width: 400,
-          marginTop: 2,
+          width: 300,
+          marginTop: 0.5,
           float: 'right'
         }}
       >
-        <InputBase
-          sx={{ ml: 1, flex: 1 }}
-          placeholder="Search Books"
-          inputProps={{ 'aria-label': 'search books' }}
-          onChange={setInputValue}
+        <MultiSearch
+          data={books}
+          valKey="title"
+          addMore={false}
+          setInputVal={(val) => setSearchInput(val)}
         />
-        <SearchIcon />
       </Paper>
       <div className="grid-container">
         {!isLoading &&

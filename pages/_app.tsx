@@ -22,7 +22,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CssBaseline from '@mui/material/CssBaseline';
 import jwtDecode from 'jwt-decode';
 import bookImg from '../Images/bookblue-open.svg';
-import { colorHash } from './Helpers/colorName';
+import { colorHash } from '../Components/Helpers/colorName';
 import { LoginAndRegister } from '../Components/LoginAndRegister';
 import '../styles/globals.css';
 import '../styles/Home.css';
@@ -147,7 +147,7 @@ function MyApp({ Component, pageProps }) {
                   }}
                 >
                   <Link href="/">
-                    <MenuItem key="1">Wypożycz książkę</MenuItem>
+                    <MenuItem key="1">Strona Główna</MenuItem>
                   </Link>
                   <Link href="/borrowedBooks">
                     <MenuItem key="2">
@@ -167,7 +167,7 @@ function MyApp({ Component, pageProps }) {
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               <Link href="/">
-                <MenuItem key="1">Wypożycz książkę</MenuItem>
+                <MenuItem key="1">Strona Główna</MenuItem>
               </Link>
               <Link href="/borrowedBooks">
                 <MenuItem key="2">
