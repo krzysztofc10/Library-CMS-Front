@@ -6,7 +6,7 @@ export const colorHash = (str: string) => {
     // eslint-disable-next-line no-bitwise
     hash = str.charCodeAt(i) + ((hash << 3) - hash);
   }
-  const color = Math.abs(hash).toString(16).substring(0, 6);
+  const color = Math.abs(hash).toString(16).substring(0, 4);
 
-  return `#${color.padStart(6, '0')}`;
+  return `#${color.padStart(4, '0')}`;
 };

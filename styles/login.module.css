@@ -44,22 +44,26 @@
 
 .loginButton1 {
   width: 100px;
+  height: 40px;
   grid-area: b;
 }
 
 .loginButton2 {
   width: 100px;
+  height: 40px;
   grid-area: c;
   justify-self: flex-end;
 }
 
 .registerButton1 {
   width: 100px;
+  height: 40px;
   grid-area: b;
 }
 
 .registerButton2 {
   width: 100px;
+  height: 40px;
   grid-area: c;
   justify-self: flex-end;
 }

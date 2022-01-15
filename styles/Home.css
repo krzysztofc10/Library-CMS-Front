@@ -38,3 +38,7 @@
     grid-template-columns: auto;
   }
 }
+
+.sr-only {
+  display: none;
+}

@@ -8,12 +8,16 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import { getUserBorrowedBooks } from '../API/getUserBorrowedBooks';
-import { deleteBorrowBook } from '../API/deleteBorrowBook';
+import { putBorrowBook } from '../API/putBorrowBook';
+
 export default function BorrowedBooks() {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const returnCopy = async (bookId, copyId, borrowId) => {
     const token = localStorage.getItem('token');
-    deleteBorrowBook(bookId, copyId, borrowId, token);
+    await putBorrowBook(bookId, copyId, borrowId, token);
+    const userId = localStorage.getItem('userId');
+    const resp = await getUserBorrowedBooks(userId, token);
+    setBorrowedBooks(resp.data.borrows);
   };
   useEffect(() => {
     const getUserBooks = async () => {
@@ -24,7 +28,7 @@ export default function BorrowedBooks() {
       setBorrowedBooks(resp.data.borrows);
     };
     getUserBooks();
-  }, [returnCopy]);
+  }, []);
 
   return (
     <TableContainer component={Paper} style={{ marginTop: 50 }}>
@@ -37,7 +41,6 @@ export default function BorrowedBooks() {
             <TableCell align="right">isbn</TableCell>
             <TableCell align="right">title</TableCell>
             <TableCell align="right">Date From</TableCell>
-            <TableCell align="right">Return</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -50,9 +53,13 @@ export default function BorrowedBooks() {
               <TableCell align="right">{row.copy.book.title}</TableCell>
               <TableCell align="right">{row.dateFrom}</TableCell>
               <TableCell align="right">
-                <Button onClick={() => returnCopy(row.copy.book.id, row.copy.id, row.id)}>
-                  Return
-                </Button>
+                {row.dateTo === null ? (
+                  <Button onClick={() => returnCopy(row.copy.book.id, row.copy.id, row.id)}>
+                    Return
+                  </Button>
+                ) : (
+                  <div style={{ color: '#90caf9' }}>Returned</div>
+                )}
               </TableCell>
             </TableRow>
           ))}

@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 import { getBookInfo } from '../../../API/getBook.tsx';
+import { postCreateBookCopy } from '../../../API/postCreateBookCopy.tsx';
 
 const style = {
   marginTop: 2,
@@ -18,6 +21,7 @@ const style = {
 export default () => {
   const [book, setBook] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [copies, setCopies] = useState('');
   const router = useRouter();
   const { id } = router.query;
 
@@ -34,6 +38,13 @@ export default () => {
     };
     fetchData();
   }, [setBook, router.isReady]);
+
+  const submitButton = async () => {
+    const token = localStorage.getItem('token');
+    await postCreateBookCopy(id, copies, token);
+    setCopies('');
+    document.getElementById('includeCopies').value = '';
+  };
 
   return !isLoading ? (
     <Box sx={style}>
@@ -198,6 +209,7 @@ export default () => {
               }
             />
           </ListItem>
+          <Divider component="li" />
           <ListItem alignItems="flex-start">
             <ListItemText
               primary="Typ"
@@ -213,8 +225,40 @@ export default () => {
               }
             />
           </ListItem>
+          <Divider component="li" />
+          <ListItem alignItems="flex-start">
+            <ListItemText
+              primary="Utwórz egzemplarze (wiele egzemplarzy proszę wpisać po przecinku):"
+              secondary={
+                <Typography
+                  sx={{ display: 'inline' }}
+                  component="span"
+                  variant="body2"
+                  color="text.primary"
+                >
+                  <TextField
+                    style={{ marginTop: 10 }}
+                    id="includeCopies"
+                    label="Egzemplarze"
+                    onChange={(e) => setCopies(e.target.value)}
+                  />
+                </Typography>
+              }
+            />
+          </ListItem>
+          <Divider component="li" />
         </List>
       </Box>
+      <Button
+        style={{ gridColumnStart: 2, gridColumnEnd: 3 }}
+        variant="contained"
+        size="small"
+        color="secondary"
+        disabled={copies.length === 0}
+        onClick={() => submitButton()}
+      >
+        Dodaj egzemplarze
+      </Button>
     </Box>
   ) : (
     <Box></Box>

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-// import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -10,11 +9,16 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { deleteBook } from '../API/deleteBook.tsx';
 
-export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors } }: any) => {
+export const BookGrids = ({
+  data: { title, id, issueDate, type, pages, authors },
+  updateBooks
+}) => {
   const newPhoto = String(id).length === 1 ? `0${id}` : String(id);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const [userRole, setUserRole] = useState('');
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -22,13 +26,25 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
     setAnchorEl(null);
   };
 
+  const deleteBookButton = async () => {
+    const token = localStorage.getItem('token');
+    await deleteBook(id, token);
+    updateBooks();
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem('role') !== undefined) {
+      setUserRole(localStorage.getItem('role'));
+    }
+  }, []);
+
   return (
     <Card sx={{ display: 'flex', boxShadow: 10, position: 'relative' }}>
       <CardMedia
         component="img"
         sx={{ width: 150 }}
         image={`https://raw.githubusercontent.com/anqxyr/racovimge/master/examples/ex${newPhoto}.png`}
-        alt="Live from space album cover"
+        alt="Book"
       />
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <CardContent sx={{ flex: '1 0 auto' }}>
@@ -68,16 +84,47 @@ export const BookGrids = ({ data: { title, id, issueDate, type, pages, authors }
                   Podgląd
                 </MenuItem>
               </Link>
-              <Link
-                href={{
-                  pathname: '/book/borrow/[id]',
-                  query: { id }
-                }}
-              >
-                <MenuItem key="2" onClick={handleClose}>
-                  Wypożycz
+              {userRole.length > 0 && (
+                <Link
+                  href={{
+                    pathname: '/book/borrow/[id]',
+                    query: { id }
+                  }}
+                >
+                  <MenuItem key="2" onClick={handleClose}>
+                    Wypożycz
+                  </MenuItem>
+                </Link>
+              )}
+              {userRole.length > 0 && (
+                <Link
+                  href={{
+                    pathname: '/book/createCopy/[id]',
+                    query: { id }
+                  }}
+                >
+                  <MenuItem key="3" onClick={handleClose}>
+                    Utwórz egzemplarz
+                  </MenuItem>
+                </Link>
+              )}
+              {userRole.length > 0 && (
+                <Link
+                  href={{
+                    pathname: '/book/edit/[id]',
+                    query: { id }
+                  }}
+                >
+                  <MenuItem key="3" onClick={handleClose}>
+                    Edytuj
+                  </MenuItem>
+                </Link>
+              )}
+              {userRole === 'admin' && (
+                <MenuItem key="4" onClick={() => deleteBookButton()}>
+                  Usuń
                 </MenuItem>
-              </Link>
+              )}
             </Menu>
           </div>
           <Typography component="div" variant="h5">

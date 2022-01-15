@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 
@@ -10,15 +10,21 @@ export const MultiSearch = ({ data, valKey, addMore, setInputVal }) => {
   return (
     <Autocomplete
       value={value}
-      onChange={(event, newValue) => {
-        setValue(newValue);
-        setInputVal(newValue);
+      onChange={async (event, newValue) => {
+        if (newValue !== null) {
+          await setValue(newValue[valKey]);
+          await setInputVal(newValue[valKey]);
+        } else {
+          await setValue('');
+          await setInputVal('');
+        }
       }}
       filterOptions={(options, params) => {
         const filtered = filter(options, params);
 
         const { inputValue } = params;
         // Suggest the creation of a new value
+
         const isExisting = options.some((option) => inputValue === option[valKey]);
         if (inputValue !== '' && !isExisting && addMore) {
           filtered.push({
@@ -26,7 +32,6 @@ export const MultiSearch = ({ data, valKey, addMore, setInputVal }) => {
             title: `Add "${inputValue}"`
           });
         }
-
         return filtered;
       }}
       selectOnFocus
@@ -46,7 +51,11 @@ export const MultiSearch = ({ data, valKey, addMore, setInputVal }) => {
         // Regular option
         return option[valKey];
       }}
-      renderOption={(props, option) => <li {...props}>{option[valKey]}</li>}
+      renderOption={(props, option) => (
+        <li {...props} key={option.id}>
+          {option[valKey]}
+        </li>
+      )}
       sx={{ width: 300 }}
       freeSolo
       renderInput={(params) => <TextField {...params} label="Search" />}
