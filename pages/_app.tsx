@@ -16,6 +16,7 @@ import {
   IconButton
 } from '@mui/material';
 import { useRouter } from 'next/router';
+import { IntlProvider } from 'react-intl';
 import Link from 'next/link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import ContrastIcon from '@mui/icons-material/Contrast';
@@ -25,6 +26,7 @@ import jwtDecode from 'jwt-decode';
 import bookImg from '../Images/bookblue-open.svg';
 import { colorHash } from '../Components/Helpers/colorName';
 import { LoginAndRegister } from '../Components/LoginAndRegister';
+import * as locales from '../content/locale';
 
 import '../styles/globals.css';
 import '../styles/Home.css';
@@ -38,6 +40,7 @@ function MyApp({ Component, pageProps }) {
   const [token, setToken] = useState('');
   const [userRole, setUserRole] = useState('');
   const [userName, setUserName] = useState('');
+  const localeMessages = locales[router.locale];
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -79,6 +82,7 @@ function MyApp({ Component, pageProps }) {
   const loginToApp = (tokenVal) => {
     setToken(tokenVal);
     setShowLogin(false);
+    router.reload();
   };
 
   const toggleColorMode = () => {
@@ -122,151 +126,181 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <div style={{ height: '100' }}>
-        <Head>
-          <title>Library CMS</title>
-        </Head>
-        <CssBaseline />
-        <AppBar position="static">
-          <Container maxWidth="xl">
-            <Toolbar disableGutters>
-              <Typography
-                variant="h6"
-                noWrap
-                component="div"
-                sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
-              >
-                <Image src={bookImg} alt="book" width="80px" height="80px" />
-              </Typography>
-              <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleOpenNavMenu}
-                  color="inherit"
+      <IntlProvider locale={router.locale} defaultLocale={router.defaultLocale}>
+        <div style={{ height: '100' }}>
+          <Head>
+            <title>{localeMessages.libraryCms}</title>
+          </Head>
+          <CssBaseline />
+          <AppBar position="static">
+            <Container maxWidth="xl">
+              <Toolbar disableGutters>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
                 >
-                  <MenuIcon />
-                </IconButton>
-                {token.length === 0 && (
+                  <Image src={bookImg} alt="book" width="80px" height="80px" />
+                </Typography>
+                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                  <IconButton
+                    size="large"
+                    aria-label="account of current user"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleOpenNavMenu}
+                    color="inherit"
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                  {token.length === 0 && (
+                    <Menu
+                      id="menu-appbar"
+                      anchorEl={anchorElNav}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left'
+                      }}
+                      open={Boolean(anchorElNav)}
+                      onClose={handleCloseNavMenu}
+                      sx={{
+                        display: { xs: 'block', md: 'none' }
+                      }}
+                    >
+                      <Link href="/">
+                        <MenuItem key="1" onClick={() => setShowLogin(false)}>
+                          {localeMessages.mainPage}
+                        </MenuItem>
+                      </Link>
+                      {userRole.length > 0 && (
+                        <Link href="/borrowedBooks">
+                          <MenuItem key="2">
+                            <Typography textAlign="center">
+                              {localeMessages.showBorowedBooks}
+                            </Typography>
+                          </MenuItem>
+                        </Link>
+                      )}
+                      {token.length > 0 && (
+                        <MenuItem key="3" onClick={() => setShowLogin(!showLogin)}>
+                          <Typography textAlign="center">{localeMessages.loginRegister}</Typography>
+                        </MenuItem>
+                      )}
+                    </Menu>
+                  )}
+                </Box>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
+                >
+                  <Image src={bookImg} alt="book" width="60px" height="60px" />
+                </Typography>
+                <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                  <Link href="/">
+                    <MenuItem key="1" onClick={() => setShowLogin(false)}>
+                      {localeMessages.mainPage}
+                    </MenuItem>
+                  </Link>
+                  {userRole.length > 0 && (
+                    <Link href="/borrowedBooks">
+                      <MenuItem key="2">
+                        <Typography textAlign="center">
+                          {localeMessages.showBorowedBooks}
+                        </Typography>
+                      </MenuItem>
+                    </Link>
+                  )}
+                  {userRole.length === 0 && (
+                    <MenuItem
+                      key="3"
+                      style={{ marginLeft: 110 }}
+                      onClick={() => setShowLogin(!showLogin)}
+                    >
+                      <Typography textAlign="center">{localeMessages.loginRegister}</Typography>
+                    </MenuItem>
+                  )}
+                </Box>
+                <Box sx={{ flexGrow: 0 }}>
+                  <Tooltip title="Otwórz ustawienia">
+                    <>
+                      <>
+                        {router.locale === 'pl' ? (
+                          <IconButton
+                            type="button"
+                            onClick={() => router.push(router.asPath, null, { locale: 'en' })}
+                          >
+                            EN
+                          </IconButton>
+                        ) : (
+                          <IconButton
+                            type="button"
+                            onClick={() => router.push(router.asPath, null, { locale: 'pl' })}
+                          >
+                            PL
+                          </IconButton>
+                        )}
+                        {token.length > 0 && (
+                          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                            <Avatar sx={{ bgcolor: colorHash(userName) }}>
+                              {userName.match(/\b(\w)/g)}
+                            </Avatar>
+                          </IconButton>
+                        )}
+                      </>
+                      {userRole.length > 0 && (
+                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                          <Avatar sx={{ bgcolor: colorHash(userName) }}>
+                            {userName.match(/\b(\w)/g)}
+                          </Avatar>
+                        </IconButton>
+                      )}
+                      <IconButton onClick={toggleColorMode}>
+                        <ContrastIcon sx={{ fontSize: 45 }} />
+                        <span className="sr-only">Close</span>
+                      </IconButton>
+                    </>
+                  </Tooltip>
                   <Menu
+                    sx={{ mt: '45px' }}
                     id="menu-appbar"
-                    anchorEl={anchorElNav}
+                    anchorEl={anchorElUser}
                     anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left'
+                      vertical: 'top',
+                      horizontal: 'right'
                     }}
                     keepMounted
                     transformOrigin={{
                       vertical: 'top',
-                      horizontal: 'left'
+                      horizontal: 'right'
                     }}
-                    open={Boolean(anchorElNav)}
-                    onClose={handleCloseNavMenu}
-                    sx={{
-                      display: { xs: 'block', md: 'none' }
-                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
                   >
-                    <Link href="/">
-                      <MenuItem key="1" onClick={() => setShowLogin(false)}>
-                        Strona główna
-                      </MenuItem>
-                    </Link>
-                    {userRole.length > 0 && (
-                      <Link href="/borrowedBooks">
-                        <MenuItem key="2">
-                          <Typography textAlign="center">Pokaż wypożyczone książki</Typography>
-                        </MenuItem>
-                      </Link>
-                    )}
-                    {token.length > 0 && (
-                      <MenuItem key="3" onClick={() => setShowLogin(!showLogin)}>
-                        <Typography textAlign="center">Zaloguj się/Zarejestruj się</Typography>
-                      </MenuItem>
-                    )}
-                  </Menu>
-                )}
-              </Box>
-              <Typography
-                variant="h6"
-                noWrap
-                component="div"
-                sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
-              >
-                <Image src={bookImg} alt="book" width="60px" height="60px" />
-              </Typography>
-              <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                <Link href="/">
-                  <MenuItem key="1" onClick={() => setShowLogin(false)}>
-                    Strona Główna
-                  </MenuItem>
-                </Link>
-                {userRole.length > 0 && (
-                  <Link href="/borrowedBooks">
-                    <MenuItem key="2">
-                      <Typography textAlign="center">Pokaż wypożyczone książki</Typography>
+                    <MenuItem key="Wyloguj" onClick={handleCloseNavMenu}>
+                      <Typography textAlign="center" onClick={() => Logout()}>
+                        {localeMessages.Logout}
+                      </Typography>
                     </MenuItem>
-                  </Link>
-                )}
-                {userRole.length === 0 && (
-                  <MenuItem
-                    key="3"
-                    style={{ marginLeft: 110 }}
-                    onClick={() => setShowLogin(!showLogin)}
-                  >
-                    <Typography textAlign="center">Zaloguj się/Zarejestruj się</Typography>
-                  </MenuItem>
-                )}
-              </Box>
-              <Box sx={{ flexGrow: 0 }}>
-                <Tooltip title="Otwórz ustawienia">
-                  <>
-                    {userRole.length > 0 && (
-                      <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                        <Avatar sx={{ bgcolor: colorHash(userName) }}>
-                          {userName.match(/\b(\w)/g)}
-                        </Avatar>
-                      </IconButton>
-                    )}
-                    <IconButton onClick={toggleColorMode}>
-                      <ContrastIcon sx={{ fontSize: 45 }} />
-                      <span className="sr-only">Close</span>
-                    </IconButton>
-                  </>
-                </Tooltip>
-                <Menu
-                  sx={{ mt: '45px' }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                >
-                  <MenuItem key="Wyloguj" onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center" onClick={() => Logout()}>
-                      Wyloguj
-                    </Typography>
-                  </MenuItem>
-                </Menu>
-              </Box>
-            </Toolbar>
-          </Container>
-        </AppBar>
-        {showLogin ? (
-          <LoginAndRegister loginFunc={(val) => loginToApp(val)} />
-        ) : (
-          <Component {...pageProps} />
-        )}
-      </div>
+                  </Menu>
+                </Box>
+              </Toolbar>
+            </Container>
+          </AppBar>
+          {showLogin ? (
+            <LoginAndRegister loginFunc={(val) => loginToApp(val)} />
+          ) : (
+            <Component {...pageProps} />
+          )}
+        </div>
+      </IntlProvider>
     </ThemeProvider>
   );
 }
