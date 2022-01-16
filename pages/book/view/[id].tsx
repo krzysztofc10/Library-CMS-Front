@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { IntlProvider } from 'react-intl';
 import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Divider from '@mui/material/Divider';
+import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { getBookInfo } from '../../../API/getBook.tsx';
+import * as locales from '../../../content/locale';
 
 const style = {
-  marginTop: 10,
+  marginTop: 2,
   display: 'grid',
   gridTemplateColumns: 'auto auto',
   justifyContent: 'center'
@@ -15,6 +21,7 @@ export default () => {
   const [book, setBook] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const localeMessages = locales[router.locale];
   const { id } = router.query;
 
   const newPhoto = String(id).length === 1 ? `0${id}` : String(id);
@@ -31,64 +38,190 @@ export default () => {
     fetchData();
   }, [setBook, router.isReady]);
 
-  return (
-    <div>
-      {!isLoading && (
-        <Box sx={style}>
-          <Box width={300} height={400}>
-            <img
-              src={`https://raw.githubusercontent.com/anqxyr/racovimge/master/examples/ex${newPhoto}.png`}
-              alt="Live from space album cover"
-              height={400}
-              width={270}
-            />
-          </Box>
-          <Box>
-            <Typography id="modal-modal-title" variant="h3" component="h3">
-              {book.title}
-            </Typography>
-            <Typography
-              id="modal-modal-title"
-              variant="subtitle1"
-              component="p"
-              style={{ fontSize: 12 }}
-            >
-              ISBN: {book.isbn}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Autorzy:
-              {book.authors.map((el) => (
-                <div key={el.id} style={{ marginLeft: 20 }}>
-                  {el.firstName} {el.lastName}
-                </div>
-              ))}
-            </Typography>
-            {book.description !== null && (
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                {book.description}
-              </Typography>
-            )}
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Gatunek: {book.genre.value}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Liczba stron: {book.pages}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Język: {book.language.value}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Data wydania: {book.issueDate}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Wydawca: {book.publisher.name}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Typ: {book.type}
-            </Typography>
-          </Box>
+  return !isLoading ? (
+    <IntlProvider locale={router.locale} defaultLocale={router.defaultLocale}>
+      <Box sx={style}>
+        <Box width={600} height={700}>
+          <img
+            src={`https://raw.githubusercontent.com/anqxyr/racovimge/master/examples/ex${newPhoto}.png`}
+            alt="Live from space album cover"
+            width={600}
+            height={700}
+          />
         </Box>
-      )}
-    </div>
+        <Box>
+          <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={localeMessages.Title}
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.title}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            <Divider component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary="ISBN"
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.isbn}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            <Divider component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={localeMessages.Authors}
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.authors.map((el) => (
+                      <div key={el.id}>
+                        {el.firstName} {el.lastName}
+                      </div>
+                    ))}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            {book.description !== null && (
+              <>
+                <Divider component="li" />
+                <ListItem alignItems="flex-start">
+                  <ListItemText
+                    primary={localeMessages.Description}
+                    secondary={
+                      <Typography
+                        sx={{ display: 'inline' }}
+                        component="span"
+                        variant="body2"
+                        color="text.primary"
+                      >
+                        {book.description}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              </>
+            )}
+            <Divider component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={localeMessages.Genre}
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.genre.value}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            <Divider component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={localeMessages.NoOfPages}
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.pages}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            <Divider component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={localeMessages.Language}
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.language.value}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            <Divider component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={localeMessages.IssueDate}
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.issueDate}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            <Divider component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={localeMessages.Publisher}
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.publisher.name}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={localeMessages.Type}
+                secondary={
+                  <Typography
+                    sx={{ display: 'inline' }}
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                  >
+                    {book.type}
+                  </Typography>
+                }
+              />
+            </ListItem>
+          </List>
+        </Box>
+      </Box>
+    </IntlProvider>
+  ) : (
+    <Box></Box>
   );
 };

@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, Paper, InputBase, Fab, Stack } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { Paper, Fab } from '@mui/material';
+import Link from 'next/link';
 import AddIcon from '@mui/icons-material/Add';
 import { BookGrids } from '../Components/BooksGrid';
-import { CreateBookModal } from '../Components/CreateBook';
 import { getBooks } from '../API/getBooks';
 import { MultiSearch } from '../Components/MultiSearch.tsx';
 import styles from '../styles/index.module.css';
 
 export default function Home() {
-  const [alert, setAlert] = useState(false);
-  const [alertContent, setAlertContent] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [books, setBooks] = useState([]);
-  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [userRole, setUserRole] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -24,37 +21,20 @@ export default function Home() {
       setIsLoading(false);
     };
     fetchData();
+    if (localStorage.getItem('role') !== null && localStorage.getItem('role').length > 0) {
+      setUserRole(localStorage.getItem('role'));
+    } else {
+      setUserRole('');
+    }
   }, [setBooks]);
 
-  const createBookModal = (text) => {
-    const timeoutFc = async () => {
-      await setAlertContent('Ksiąką został utworzona');
-      await setAlert(true);
-      setTimeout(() => setAlert(false), 3000);
-    };
-    setCreateModalVisible(!createModalVisible);
-    if (text === 'Created') {
-      timeoutFc();
-    }
+  const updateData = async () => {
+    const data = await getBooks();
+    setBooks(data.data.books);
   };
 
   return (
     <>
-      {alert && (
-        <Stack
-          style={{
-            position: 'absolute',
-            zIndex: 9999,
-            width: 500,
-            left: '35%',
-            right: '50%',
-            top: '0%'
-          }}
-          spacing={2}
-        >
-          <Alert>{alertContent}</Alert>
-        </Stack>
-      )}
       <Paper
         component="form"
         sx={{
@@ -76,24 +56,20 @@ export default function Home() {
           books.map((el) =>
             searchInput.length > 0 ? (
               el.title.toLowerCase().startsWith(searchInput) || el.title.startsWith(searchInput) ? (
-                <BookGrids data={el} />
+                <BookGrids data={el} key={el.id} updateBooks={() => updateData()} />
               ) : null
             ) : (
-              <BookGrids data={el} key={el.id} />
+              <BookGrids data={el} key={el.id} updateBooks={() => updateData()} />
             )
           )}
-        <Fab
-          aria-label="add"
-          color="primary"
-          className={styles.fab}
-          onClick={() => setCreateModalVisible(true)}
-        >
-          <AddIcon />
-        </Fab>
-        <CreateBookModal
-          modalVisible={createModalVisible}
-          setModalVisible={(text) => createBookModal(text)}
-        />
+        {userRole === 'admin' ||
+          (userRole === 'employee' && (
+            <Link href="/book/create">
+              <Fab aria-label="add" color="primary" className={styles.fab}>
+                <AddIcon />
+              </Fab>
+            </Link>
+          ))}
       </div>
     </>
   );

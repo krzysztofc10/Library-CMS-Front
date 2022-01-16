@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import PropTypes, { any, arrayOf, bool, func, number } from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import { IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Divider from '@mui/material/Divider';
+import ListItemText from '@mui/material/ListItemText';
+import { IntlProvider } from 'react-intl';
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid';
 import { getBookInfo } from '../../../API/getBook.tsx';
 import { getBookCopies } from '../../../API/getBookCopies.tsx';
 import { postBookBorrowCopies } from '../../../API/postBorrowBook.tsx';
+import * as locales from '../../../content/locale';
 
 const style = {
   marginTop: 10,
@@ -36,26 +38,27 @@ export default () => {
   const [selectionModel, setSelectionModel] = React.useState<GridRowId[]>([]);
   const [rowId, setRowId] = useState([]);
   const router = useRouter();
+  const localeMessages = locales[router.locale];
   const { id } = router.query;
 
   const newPhoto = String(id).length === 1 ? `0${id}` : String(id);
 
   useEffect(() => {
-    if (!router.isReady) return;
     const fetchData = async () => {
       setIsLoading(true);
 
       const dane = await getBookInfo(id);
-      setBook(dane.data.book);
+      await setBook(dane.data.book);
       setIsLoading(false);
       setIsLoadingCopies(true);
       const token = localStorage.getItem('token');
       const bookCopiesData = await getBookCopies(id, token);
-      setBookCopies(bookCopiesData.data.copies);
+      await setBookCopies(bookCopiesData.data.copies);
       setIsLoadingCopies(false);
     };
     fetchData();
-  }, [setBook, router.isReady]);
+    if (!router.isReady) return;
+  }, [router.isReady]);
 
   const rowClicked = async (rowVal) => {
     if (rowId.indexOf(rowVal.row.id) === -1) {
@@ -81,77 +84,202 @@ export default () => {
     }, 700);
   };
 
-  return (
-    <div>
-      {alert && (
-        <Stack
-          style={{
-            position: 'absolute',
-            zIndex: 9999,
-            width: 500,
-            left: '35%',
-            right: '50%',
-            top: '0%'
-          }}
-          spacing={2}
-        >
-          <Alert>{alertContent}</Alert>
-        </Stack>
-      )}
-
-      {!isLoading && (
+  return !isLoading ? (
+    <IntlProvider locale={router.locale} defaultLocale={router.defaultLocale}>
+      <>
+        {alert && (
+          <Stack
+            style={{
+              position: 'absolute',
+              zIndex: 9999,
+              width: 500,
+              left: '35%',
+              right: '50%',
+              top: '0%'
+            }}
+            spacing={2}
+          >
+            <Alert>{alertContent}</Alert>
+          </Stack>
+        )}
         <Box sx={style}>
-          <Box width={300} height={400}>
+          <Box width={600} height={700}>
             <img
               src={`https://raw.githubusercontent.com/anqxyr/racovimge/master/examples/ex${newPhoto}.png`}
               alt="Live from space album cover"
-              height={400}
-              width={270}
+              width={600}
+              height={700}
             />
           </Box>
           <Box>
-            <Typography id="modal-modal-title" variant="h3" component="h3">
-              {book.title}
-            </Typography>
-            <Typography
-              id="modal-modal-title"
-              variant="subtitle1"
-              component="p"
-              style={{ fontSize: 12 }}
-            >
-              ISBN: {book.isbn}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Autorzy:
-              {book.authors.map((el) => (
-                <div key={el.id} style={{ marginLeft: 20 }}>
-                  {el.firstName} {el.lastName}
-                </div>
-              ))}
-            </Typography>
-            {book.description !== null && (
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                {book.description}
-              </Typography>
-            )}
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Gatunek: {book.genre.value}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Liczba stron: {book.pages}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Język: {book.language.value}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Data wydania: {book.issueDate}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Wydawca: {book.publisher.name}
-            </Typography>
-            <Typography id="modal-modal-title" variant="h5" component="h5">
-              Typ: {book.type}
-            </Typography>
+            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={localeMessages.Title}
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.title}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary="ISBN"
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.isbn}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={localeMessages.AutorsAfter}
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.authors.map((el) => (
+                        <div key={el.id}>
+                          {el.firstName} {el.lastName}
+                        </div>
+                      ))}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              {book.description !== null && (
+                <>
+                  <Divider component="li" />
+                  <ListItem alignItems="flex-start">
+                    <ListItemText
+                      primary={localeMessages.Description}
+                      secondary={
+                        <Typography
+                          sx={{ display: 'inline' }}
+                          component="span"
+                          variant="body2"
+                          color="text.primary"
+                        >
+                          {book.description}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                </>
+              )}
+              <Divider component="li" />
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={localeMessages.Genre}
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.genre.value}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={localeMessages.NoOfPages}
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.pages}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={localeMessages.Language}
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.language.value}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={localeMessages.IssueDate}
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.issueDate}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={localeMessages.Publisher}
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.publisher.name}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={localeMessages.Type}
+                  secondary={
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {book.type}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+            </List>
           </Box>
           {!isLoadingCopies && (
             <Box
@@ -191,18 +319,20 @@ export default () => {
               />
               <Button
                 disabled={rowId.length < 1}
-                style={{ gridColumnStart: 2, gridColumnEnd: 3, float: 'right' }}
+                style={{ gridColumnStart: 2, gridColumnEnd: 3, float: 'right', marginTop: 10 }}
                 variant="contained"
                 size="small"
                 color="secondary"
                 onClick={() => borrowBook()}
               >
-                Wypożycz
+                {localeMessages.Borrow}
               </Button>
             </Box>
           )}
         </Box>
-      )}
-    </div>
+      </>
+    </IntlProvider>
+  ) : (
+    <Box></Box>
   );
 };
