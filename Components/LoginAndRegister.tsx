@@ -65,7 +65,7 @@ export const LoginAndRegister = ({ loginFunc }) => {
                 variant="contained"
                 color="secondary"
                 className={styles.loginButton1}
-                style={{ marginTop: 60, marginBottom: 50 }}
+                style={{ marginTop: 60, marginBottom: 50, width: 150 }}
               >
                 {localeMessages.Register}
               </Button>
@@ -74,7 +74,7 @@ export const LoginAndRegister = ({ loginFunc }) => {
                 variant="contained"
                 color="secondary"
                 className={styles.loginButton2}
-                style={{ marginTop: 60, marginBottom: 50 }}
+                style={{ marginTop: 60, marginBottom: 50, width: 150 }}
               >
                 {localeMessages.Submit}
               </Button>
@@ -124,7 +124,7 @@ export const LoginAndRegister = ({ loginFunc }) => {
                 onClick={() => registerFunc()}
                 variant="contained"
                 color="secondary"
-                style={{ marginTop: 60, marginBottom: 50 }}
+                style={{ marginTop: 60, marginBottom: 50, width: 150 }}
                 className={styles.registerButton1}
               >
                 {localeMessages.Login}
@@ -133,7 +133,7 @@ export const LoginAndRegister = ({ loginFunc }) => {
                 onClick={() => SubmitRegBtn()}
                 variant="contained"
                 color="secondary"
-                style={{ marginTop: 60, marginBottom: 50 }}
+                style={{ marginTop: 60, marginBottom: 50, width: 150 }}
                 className={styles.registerButton2}
               >
                 {localeMessages.Submit}
