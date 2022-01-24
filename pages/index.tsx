@@ -62,14 +62,13 @@ export default function Home() {
               <BookGrids data={el} key={el.id} updateBooks={() => updateData()} />
             )
           )}
-        {userRole === 'admin' ||
-          (userRole === 'employee' && (
-            <Link href="/book/create">
-              <Fab aria-label="add" color="primary" className={styles.fab}>
-                <AddIcon />
-              </Fab>
-            </Link>
-          ))}
+        {userRole !== 'customer' && userRole !== '' && (
+          <Link href="/book/create">
+            <Fab aria-label="add" color="primary" className={styles.fab}>
+              <AddIcon />
+            </Fab>
+          </Link>
+        )}
       </div>
     </>
   );
