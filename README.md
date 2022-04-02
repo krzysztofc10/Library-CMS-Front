@@ -26,3 +26,5 @@ Go to main directory and use this two commands:
 docker-compose build
 
 docker-compose up -d
+
+then open localhost:3000 on your browser
